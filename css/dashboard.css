@@ -1,0 +1,143 @@
+body {
+	width:100%;
+	height:100%;
+	padding:0px;
+	margin:0px;
+	overflow:hidden;
+}
+#dashboard {
+	width:100%;
+	height:99%;
+	padding:0px;
+	margin:0px;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+#msgboard {
+	position:fixed;
+	left:3px;
+	bottom:0px;
+	overflow-x:hidden;
+	min-width:50%;
+}
+#msgboard .msg {
+	width:95%;
+	padding-left:10px;
+	margin-bottom:2px;
+	cursor:pointer;
+	font:14px Georgia;
+}
+#controller {
+	position:fixed;
+	right:20px;
+	bottom:10px;
+	overflow-x:hidden;
+	width:30px;height:30px;
+	background: url(images/gear.png) no-repeat;
+	cursor:pointer;
+}
+#controller:hover {
+	opacity:0.6;
+}
+#dashboard .column { width:30%;min-height:50%;float:left;padding-bottom:100px;}
+#dashboard .portlet { margin: 0.2em 0.5em 0em 0;margin: 3px;padding: 1px;float: left;overflow: hidden;max-height: 300px;}
+#dashboard .portlet-header { margin: 0em; padding-bottom: 4px; padding-left: 0.2em; border:0px; height:20px;}
+#dashboard .portlet-header .ui-icon { float: right; margin-top:3px; cursor:pointer;}
+#dashboard .portlet-header .ui-icon.marginLeft { margin-right:5px;}
+#dashboard .portlet-header .ui-icon:hover { opacity:0.5;}/*border:1px solid #aaa; -moz-border-radius: 6px; -webkit-border-radius: 6px; -khtml-border-radius: 6px; border-radius: 6px;*/
+#dashboard .portlet-header .title {padding-top: 3px;}
+#dashboard .portlet-body { padding: 0em; }
+#dashboard .portlet-container { overflow: auto; }
+#dashboard .portlet-content { padding: 0.2em; height: 98%;background: white;}
+#dashboard .portlet-config { padding: 0.2em; height:100%; display:none;}
+#dashboard .portlet-footer { padding: 0.2em; height:100%; display:none;}
+#dashboard .portlet-info { padding: 0.2em; height:100%; display:none;}
+.ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important;width:33%;height:50px;}
+.ui-sortable-placeholder * { visibility: hidden; }
+
+#dashboard .portlet.ui-widget.ui-widget-content {
+	padding:0px;
+}
+#dashboard .portlet-header.ui-widget-header {
+	cursor:move;
+}
+#dashboard .portlet {
+	-webkit-border-radius: 0.5em;
+	-moz-border-radius: 0.5em;
+	-khtml-border-radius: 0.5em;
+	border-radius: 0.5em;
+/*
+  	background:transparent;
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#aaa', endColorstr='#ddd');
+	background: transparent -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#ddd));
+	background: transparent -moz-linear-gradient(top,  #aaa,  #ddd);
+	background: transparent -khtml-linear-gradient(top,  #aaa,  #ddd);
+
+	border: solid 2px #fff;*/
+}
+#dashboard .portlet_none {
+	background:transparent;
+}
+
+#dashboard .dashletLoader {
+	display: none;
+}
+
+ul.configurations {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	margin-bottom:10px;
+}
+ul.configurations>li {
+	padding-left: 30px;
+}
+ul.configurations label {
+	width:100px;height:23px;
+	display: inline-block;
+}
+ul.configurations input,ul.configurations textarea,ul.configurations select {
+	width: 150px;height:23px;
+	border:1px solid #AAA;
+	margin:0px;padding:1px;
+}
+ul.configurations select {
+	width: 155px;
+}
+/*
+#dashboard .portlet-header.ui-widget-header {
+	background:transparent;
+	border:0px;
+	padding:0px;
+	padding-left:10px;
+	height:20px;
+}
+*/
+h3 {
+	margin:1px;padding:0px;color:maroon;
+}
+input,textarea {
+	border:1px solid #AAA;
+}
+button.nostyle {
+	padding:3px;
+	padding-left: 8px;padding-right: 8px;
+	cursor: pointer;
+}
+button.nostyle:hover {
+	opacity: 0.5
+}
+table, table tr, table td {
+	border:0px;
+}
+
+.hidden {
+	display: none;
+}
+/*Jquery UI Tweaks*/
+.ui-dialog {
+	font-size:12px;
+}
+.ui-dialog .ui-dialog-content {
+	padding:1px;
+}
