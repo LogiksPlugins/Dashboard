@@ -1,0 +1,195 @@
+.dashboardContainer {
+	width: 100%;height: 100%;
+	overflow-x: visible;
+	overflow-y: auto;
+	padding-top: 15px;
+
+	background: #F9F9F9;
+}
+
+.dashletContainer {
+	max-height: 50%;
+}
+
+.dashletPanel {
+	/*border-color: #EEEEEE;*/
+	border-color: #FFF;
+
+    box-shadow: none;
+	-webkit-box-shadow: none;
+    
+    border-radius:0px;
+}
+
+/* Panel Header */
+
+.dashletPanel .panel-heading {
+	padding: 7px 13px;
+	color: #333;
+    background-color: #FFFFFF;
+    border-color: #FFF;
+    /*border-color: #ddd;*/
+	/*color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;*/
+}
+.dashletPanel.active .panel-heading {
+	border-color: #FAFAFA;
+}
+.dashletPanel .panel-heading .panel-title {
+	padding-left: 18px;
+	cursor: move;
+}
+
+.dashletPanel .panel-heading .dashletOption {
+	cursor: pointer;
+	color: #666;
+}
+.dashletPanel:hover .panel-heading .dashletOption {
+	
+}
+
+.dashletPanel .panel-heading .dashletOption.dashletHandle {
+	width: 14px;
+    height: 14px;
+    position: absolute;
+    left: 25px;
+    top: 9px;
+    font-size: 14px;
+}
+
+.dashletPanel .panel-heading .dashletOption.pull-right {
+	opacity: 0;
+    filter: alpha(opacity=0);
+    -webkit-transition: opacity 0.2s;
+    transition: opacity 0.2s;
+
+	margin: 10px;
+    margin-top: 0px;
+    margin-right: -5px;
+}
+.dashletPanel:hover .panel-heading .dashletOption.pull-right {
+	opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+
+/* Panel Body */
+.dashletPanel .panel-body {
+	display: none;
+	padding:5px;
+}
+.dashletPanel .panel-body.nopadding {
+	padding:0px;
+}
+.dashletPanel.active .panel-body {
+	display: block;
+}
+
+/* Panel Options */
+.dashletPanel .panel-options {
+	display: none;
+	font-size: 12px;
+}
+.dashletPanel .panel-options th, .dashletPanel .panel-options td {
+	padding: 2px;
+	font-weight: normal;
+}
+.dashletPanel .panel-options th {
+	padding: 5px;
+	width: 40%;
+}
+.dashletPanel .panel-options td input,
+	.dashletPanel .panel-options td select {
+	width: 100%;
+	height: 100%;
+	background: white;		
+	border: 0px;
+	outline: 0px;
+	font-size: 13px;
+}
+
+.dashletPanel.ajaxloading {
+	background-color: white;
+	padding: 30px;
+}
+.dashletPanel.ajaxloading>*{
+	display: none;
+}
+
+.dashletPanel .panel-footer {
+	padding: 7px 13px;
+    background: white;
+    font-size: 10px;
+}
+
+
+#focus-overlay {
+    background: rgba(0, 0, 0, 0.95);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1010;
+}
+.dashletContainer.dashletContainer-focus-enabled {
+    z-index: 1011;
+    position: relative;
+}
+.dashletContainer.dashletContainer-focus-enabled .panel-body {
+	display: block;
+}
+.dashletContainer.dashletContainer-focus-enabled .panel-heading .dashletOption.pull-right:not(.dashletFocus) {
+	display: none;
+}
+
+.dashletContainer.static {
+
+}
+.dashletContainer.static .panel-heading {
+	display: none;
+}
+.dashletContainer.static .panel-body {
+	display: block;
+}
+
+.dashletContainer.clear-left {
+	clear: left !important;
+}
+
+/*Special Classes For Dashlet Container*/
+.dashletContainer iframe {
+	/*margin: -5px;*/
+    width: 100%;height: 75%;
+}
+
+
+/*Max Heights For DashletContainer*/
+.dashletContainer.maxHeight-10 {
+	max-height: 10%;
+}
+.dashletContainer.maxHeight-20 {
+	max-height: 20%;
+}
+.dashletContainer.maxHeight-25 {
+	max-height: 25%;
+}
+.dashletContainer.maxHeight-40 {
+	max-height: 40%;
+}
+.dashletContainer.maxHeight-50 {
+	max-height: 50%;
+}
+.dashletContainer.maxHeight-60 {
+	max-height: 60%;
+}
+.dashletContainer.maxHeight-80 {
+	max-height: 80%;
+}
+.dashletContainer.maxHeight-90 {
+	max-height: 90%;
+}
+.dashletContainer.maxHeight-100 {
+	max-height: 100%;
+}
