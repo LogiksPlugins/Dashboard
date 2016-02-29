@@ -1,6 +1,16 @@
 $(function() {
 	$("#dashboardContainer .dashletPanel.ajaxloading").removeClass("ajaxloading8").removeClass("ajaxloading");
 
+	$(".dashboardContainer").delegate(".dashboardSettingsIcon","click",function(e) {
+		e.preventDefault();
+
+		loadDashletList();
+
+		$('#dashboardSettingsModal').modal({
+			  keyboard: false
+			});
+	});
+
 	$("#dashboardContainer").delegate(".dashletPanel .dashletOption.dashletHandle","click",function(e) {
 		e.preventDefault();
 
@@ -139,8 +149,8 @@ function saveDashletState(dashkey, attrName, attrValue) {
 	});
 }
 
-function loadDashletSelector() {
-
+function updateDashboard() {
+	window.location.reload();
 }
 
 //Specific Dashlet Support Functions
@@ -155,4 +165,5 @@ function change_forcenewrow(dashlet,attrValue) {
 	}
 }
 function change_active(dashlet,attrValue) {
+	
 }
