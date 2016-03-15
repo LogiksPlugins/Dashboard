@@ -237,6 +237,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 			$fs=scandir($dir);
 			$fs=array_splice($fs,2);
 			foreach ($fs as $fx) {
+				if(substr($fx,0,1)=="~") continue;
 				$file=$dir.$fx;
 				$extension = pathinfo($file, PATHINFO_EXTENSION);
 				if($extension=="json") {
