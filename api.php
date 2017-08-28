@@ -189,7 +189,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 				break;
 			
 			case 'module':
-				loadModule($source);
+				loadModuleLib($source,"dashlet",$dashletConfig);
 				break;
 
 			case 'iframe':
@@ -204,8 +204,8 @@ if(!function_exists("getDefaultDashletConfig")) {
 				break;
 
 			case 'php':
-				if(file_exists(APPROOT.$source)) {
-					include APPROOT.$source;
+				if(file_exists(APPROOT.APPS_PLUGINS_FOLDER."dashlets/{$source}.php")) {
+					include APPROOT.APPS_PLUGINS_FOLDER."dashlets/{$source}.php";
 				} else {
 					echo "<h3 align=center>Dashlet Source Not Found</h3>";
 				}
@@ -219,7 +219,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 
 	function listDashlets($recache=false) {
 		$paths=getLoaderFolders('pluginPaths',"dashlets");
-		$currentDashlets=getUserConfig("dashboard")['dashlets'];
+		$currentDashlets=getUserConfig("dashboard-".SITENAME)['dashlets'];
 
 		$loadedDashlets=[];
 		foreach ($currentDashlets as $dash) {

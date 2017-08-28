@@ -4,9 +4,9 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 include_once __DIR__."/api.php";
 
 if(isset($_GET['debug']) && $_GET['debug']=="true") {
-	$dashboardConfig=getUserConfig("dashboard",__DIR__,true);
+	$dashboardConfig=getUserConfig("dashboard-".SITENAME,__DIR__,true);
 } else {
-	$dashboardConfig=getUserConfig("dashboard");
+	$dashboardConfig=getUserConfig("dashboard-".SITENAME);
 }
 
 if(!isset($dashboardConfig['order']) || count($dashboardConfig['order'])<=0 || 

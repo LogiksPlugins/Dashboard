@@ -213,6 +213,11 @@
 #dashboardSettingsModal {
 
 }
+#dashboardSettingsModal .modal-title .panel-heading {
+	background-color: #3c8dbc;
+	color: white;
+	font-weight: bold;
+}
 #dashboardSettingsModal .row {
 	margin-top: -15px;margin-bottom: -15px;max-height: 75%;height: 75%;overflow: auto;
 }
@@ -230,7 +235,7 @@
 	width: 100%;
 }
 #dashboardSettingsModal .row.noinfo .list-group-item {
-	width: 33%;
+	width: 32%;
     border-radius: 0px !important;
     margin: 5px;
     float: left;

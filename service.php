@@ -1,13 +1,10 @@
 <?php
 if(!defined('ROOT')) exit('No direct script access allowed');
-
-if(!isset($_REQUEST["action"])) {
-	$_REQUEST["action"]="";
-}
+checkServiceSession();
 
 include_once __DIR__."/api.php";
 
-$dashboardConfig=getUserConfig("dashboard");
+$dashboardConfig=getUserConfig("dashboard-".SITENAME);
 
 switch($_REQUEST["action"]) {
 	case "saveDashletState":
@@ -28,7 +25,7 @@ switch($_REQUEST["action"]) {
 				$dashboardConfig['dashlets'][$dashkey]=$config;
 
 				//printArray($dashboardConfig['dashlets'][$dashkey]);
-				setUserConfig("dashboard",$dashboardConfig);
+				setUserConfig("dashboard-".SITENAME,$dashboardConfig);
 
 				printServiceMSG(array("status"=>"success","msg"=>"Successfully saved dashlet."));
 			} else {
@@ -51,7 +48,7 @@ switch($_REQUEST["action"]) {
 				//$dashboardConfig['dashlets'][$dashkey]=$config;
 
 				//printArray($dashboardConfig['dashlets'][$dashkey]);
-				//setUserConfig("dashboard",$dashboardConfig);
+				//setUserConfig("dashboard-".SITENAME,$dashboardConfig);
 
 				printServiceMSG(array("status"=>"success","msg"=>"Successfully saved dashlet."));
 			} else {
@@ -76,7 +73,7 @@ switch($_REQUEST["action"]) {
 				}
 			}
 
-			setUserConfig("dashboard",$dashboardConfig);
+			setUserConfig("dashboard-".SITENAME,$dashboardConfig);
 
 			printServiceMSG(array("status"=>"success","msg"=>"Successfully reordered dashboard."));
 		} else {
@@ -163,7 +160,7 @@ switch($_REQUEST["action"]) {
 					$dashboardConfig['dashlets'][$dashkey]=$json;
 				}
 			}
-			setUserConfig("dashboard",$dashboardConfig);
+			setUserConfig("dashboard-".SITENAME,$dashboardConfig);
 			printServiceMSG(['status'=>"success","new"=>$dxs]);
 		} else {
 			trigger_error("Dashkey not found.");

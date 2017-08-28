@@ -1,6 +1,11 @@
 <div id="dashboardSettingsModal" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
+		  <div class="modal-title">
+		  	<div class="panel-heading">
+		  		Manage Dashlets
+		  	</div>
+		  </div>
 		  <div class="modal-body">
 			  <div class="row noinfo">
 			  		<div class="dashletList list-group col-md-4">
