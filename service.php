@@ -13,7 +13,7 @@ switch($_REQUEST["action"]) {
 			unset($_POST['dashkey']);
 			if(isset($dashboardConfig['dashlets'][$dashkey])) {
 				$config=$dashboardConfig['dashlets'][$dashkey];
-
+				
 				foreach ($_POST as $key => $value) {
 					if(isset($config['config'][$key])) {
 						$config['config'][$key]=$value;
@@ -21,9 +21,9 @@ switch($_REQUEST["action"]) {
 						$config[$key]=$value;
 					}
 				}
-
+				
 				$dashboardConfig['dashlets'][$dashkey]=$config;
-
+				
 				//printArray($dashboardConfig['dashlets'][$dashkey]);
 				setUserConfig("dashboard-".SITENAME,$dashboardConfig);
 
@@ -83,11 +83,17 @@ switch($_REQUEST["action"]) {
 
 	case "listDashlets":
 		$dashlets=listDashlets();
+		foreach($dashlets as $a=>$b) {
+			unset($dashlets[$a]['source']);
+		}
 		printServiceMSG($dashlets);
 	break;
 
 	case "relistDashlets":
 		$dashlets=listDashlets(true);
+		foreach($dashlets as $a=>$b) {
+			unset($dashlets[$a]['source']);
+		}
 		printServiceMSG($dashlets);
 	break;
 

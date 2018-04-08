@@ -81,7 +81,9 @@ if(!function_exists("getDefaultDashletConfig")) {
 
 	function printDashlet($dashkey, $dashletConfig) {
 		$dashlet=array_merge(getDefaultDashletConfig(),$dashletConfig);
-
+		if(!checkUserRoles("DASHBOARD","Dashlets",$dashlet['source'])) {
+			return false;
+		}
 		?>
 			<div data-dashkey='<?=$dashkey?>' class='dashletContainer col-xs-12 col-sm-12 col-md-<?=$dashlet['column']?> col-lg-<?=$dashlet['column']?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>'>
 				<div class="dashletPanel <?=$dashlet['active']?"active":''?> panel panel-default ajaxloading ajaxloading8">
@@ -251,7 +253,9 @@ if(!function_exists("getDefaultDashletConfig")) {
 					if(array_key_exists($dKey, $loadedDashlets)) {
 						$dashConfig['active']=$loadedDashlets[$dKey];
 					}
-					$dashlets[$dKey]=$dashConfig;
+					if(checkUserRoles("DASHBOARD","Dashlets",$dKey)) {
+						$dashlets[$dKey]=$dashConfig;
+					}
 				}
 			}
 		}
