@@ -3,6 +3,8 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 
 include_once __DIR__."/api.php";
 
+$_SESSION['DASHDATA']=[];
+
 if(isset($_GET['debug']) && $_GET['debug']=="true") {
 	$dashboardConfig=getUserConfig("dashboard-".SITENAME,__DIR__,true);
 } else {

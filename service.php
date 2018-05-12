@@ -7,6 +7,22 @@ include_once __DIR__."/api.php";
 $dashboardConfig=getUserConfig("dashboard-".SITENAME);
 
 switch($_REQUEST["action"]) {
+  case "dashletData":
+    if(isset($_POST['dashkey'])) {
+      $dashkey=$_POST['dashkey'];
+			unset($_POST['dashkey']);
+			if(isset($_SESSION['DASHDATA'][$dashkey])) {
+        $src=$_SESSION['DASHDATA'][$dashkey];
+        $srcData=processDataQuery($src);
+        
+        printServiceMSG($srcData);
+      }else {
+				trigger_error("Dashkey not in use. {$dashkey}");
+			}
+    } else {
+			trigger_error("Dashkey not found.");
+		}
+    break;
 	case "saveDashletState":
 		if(isset($_POST['dashkey'])) {
 			$dashkey=$_POST['dashkey'];
@@ -175,6 +191,55 @@ switch($_REQUEST["action"]) {
 
 	default:
 		trigger_error("Action Not Defined or Not Supported");
+}
+
+function processDataQuery($source) {
+  if(!isset($source['type'])) {
+		trigger_error("Corrupt Data Configuration");
+	}
+  
+  if(isset($source['dbkey'])) {
+		$dbKey=$source['dbkey'];
+	} else {
+		$dbKey="app";
+	}
+  
+  if(!isset($source['limit'])) $source['limit']=100;
+  if(!isset($source['index'])) $source['index']=0;
+  
+  $data=[];$meta=[];
+	switch ($source['type']) {
+      case 'sql':
+        $sql=QueryBuilder::fromArray($source,_db($dbKey));
+        if(isset($reportConfig['DEBUG']) && $reportConfig['DEBUG']==true) {
+          exit($sql->_SQL());
+        }
+        $data=$sql->_GET();
+        $meta=[
+          "index"=>$source['index'],
+          "limit"=>$source['limit'],
+          "count"=>count($data),
+        ];
+      break;
+      case 'php':
+        if(isset($source['file'])) {
+          $file=APPROOT.$source['file'];
+          if(file_exists($file) && is_file($file)) {
+            $data=include_once($file);
+          }
+        }
+      break;
+      case 'jsonuri':
+      if(isset($source['uri'])) {
+        $data=file_get_contents($source['uri']);
+        $data=json_decode($data,true);
+      }
+      break;
+      case 'xmluri':
+      break;
+  }
+  
+  return ["DATA"=>$data,"META"=>$meta];
 }
 
 ?>

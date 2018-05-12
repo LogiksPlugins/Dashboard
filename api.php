@@ -2,7 +2,17 @@
 if(!defined('ROOT')) exit('No direct script access allowed');
 
 if(!function_exists("getDefaultDashletConfig")) {
-
+  function setDashData($dataSource) {
+    $key=md5(time().rand(0,100000));
+    $_SESSION['DASHDATA'][$key]=$dataSource;
+    return $key;
+  }
+  function getDashData($key) {
+    if(isset($_SESSION['DASHDATA']) && isset($_SESSION['DASHDATA'][$key])) {
+      return $_SESSION['DASHDATA'][$key];
+    }
+    return false;
+  }
 	function getDefaultDashletConfig() {
 		return [
 				"title"=>"",
