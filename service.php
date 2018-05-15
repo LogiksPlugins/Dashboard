@@ -211,7 +211,7 @@ function processDataQuery($source) {
 	switch ($source['type']) {
       case 'sql':
         $sql=QueryBuilder::fromArray($source,_db($dbKey));
-        if(isset($reportConfig['DEBUG']) && $reportConfig['DEBUG']==true) {
+        if(isset($source['DEBUG']) && $source['DEBUG']==true) {
           exit($sql->_SQL());
         }
         $data=$sql->_GET();
