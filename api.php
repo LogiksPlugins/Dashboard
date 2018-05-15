@@ -218,6 +218,8 @@ if(!function_exists("getDefaultDashletConfig")) {
 			case 'php':
 				if(file_exists(APPROOT.APPS_PLUGINS_FOLDER."dashlets/{$source}.php")) {
 					include APPROOT.APPS_PLUGINS_FOLDER."dashlets/{$source}.php";
+				} elseif(file_exists(APPROOT."pluginsDev/dashlets/{$source}.php")) {
+					include APPROOT."pluginsDev/dashlets/{$source}.php";
 				} else {
 					echo "<h3 align=center>Dashlet Source Not Found</h3>";
 				}
