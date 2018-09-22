@@ -105,7 +105,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 						<div class="dashletOption dashletSettings glyphicon glyphicon-cog pull-right" cmd='settings'></div>
 						<div class="dashletOption dashletFocus glyphicon glyphicon-eye-open pull-right" cmd='focus'></div>
 
-						<h3 class="panel-title"><?=$dashlet['title']?></h3>
+						<h3 class="panel-title"><?=_ling($dashlet['title'])?></h3>
 					</div>
 					<?php 
 						} elseif(is_file(APPROOT.$dashlet['header'])) { 
@@ -140,12 +140,12 @@ if(!function_exists("getDefaultDashletConfig")) {
 								}
 							?>
 						</select></td> </tr>
-						<tr> <th>Force New Row</th> <td><select name='forcenewrow' data-value='<?=$dashlet['forcenewrow']?>' class='form-control'>
+						<tr> <th><?=_ling("Force New Row")?></th> <td><select name='forcenewrow' data-value='<?=$dashlet['forcenewrow']?>' class='form-control'>
 							<?php
 								if($dashlet['forcenewrow']) {
-									echo "<option value='true' selected>Yes</option><option value='false'>No</option>";
+									echo "<option value='true' selected>"._ling("Yes")."</option><option value='false'>"._ling("No")."</option>";
 								} else {
-									echo "<option value='true'>Yes</option><option value='false' selected>No</option>";
+									echo "<option value='true'>"._ling("Yes")."</option><option value='false' selected>"._ling("No")."</option>";
 								}
 							?>
 						</select></td> </tr>
