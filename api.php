@@ -256,9 +256,9 @@ if(!function_exists("getDefaultDashletConfig")) {
 				$extension = pathinfo($file, PATHINFO_EXTENSION);
 				if($extension=="json") {
 					$dKey=str_replace(".json", '', $fx);
-					$dKey = toTitle($dKey);
+					$dKey = $dKey;
 					$dashConfig=[
-								"title"=>_ling($dKey),
+								"title"=>_ling(toTitle($dKey)),
 								"source"=>$file,
 								"active"=>0,
 							];
