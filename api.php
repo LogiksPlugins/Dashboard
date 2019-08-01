@@ -122,7 +122,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 					<div class="panel-body">
 					<?php 
 						if(!isset($dashlet['config'])) $dashlet['config']=[];
-						echo getDashletBody($dashlet['type'],$dashlet['source'],$dashlet['config']);
+						echo getDashletBody($dashlet['type'],$dashlet['source'],$dashlet['config'],$dashlet);
 					?>
 					</div>
 					
@@ -193,8 +193,8 @@ if(!function_exists("getDefaultDashletConfig")) {
 		<?php
 	}
 
-	function getDashletBody($type, $source, $dashletConfig=[]) {
-		//echo "$type $source";
+	function getDashletBody($type, $source, $dashletConfig=[], $dashlet = []) {
+		// echo "$type $source";
 		switch ($type) {
 			case 'widget':
 				loadWidget($source,$dashletConfig);
@@ -216,6 +216,9 @@ if(!function_exists("getDefaultDashletConfig")) {
 				break;
 
 			case 'php':
+				if(isset($dashlet['folder']) && strlen($dashlet['folder'])>1) {
+					$source = "{$dashlet['folder']}/$source";
+				}
 				if(file_exists(APPROOT.APPS_PLUGINS_FOLDER."dashlets/{$source}.php")) {
 					include APPROOT.APPS_PLUGINS_FOLDER."dashlets/{$source}.php";
 				} elseif(file_exists(APPROOT."pluginsDev/dashlets/{$source}.php")) {
@@ -231,7 +234,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 		}
 	}
 
-	function listDashlets($recache=false) {
+	function listDashlets($recache=false,$flatList=false) {
 		$paths=getLoaderFolders('pluginPaths',"dashlets");
 		$currentDashlets=getUserConfig("dashboard-".SITENAME)['dashlets'];
 
@@ -256,9 +259,9 @@ if(!function_exists("getDefaultDashletConfig")) {
 				$extension = pathinfo($file, PATHINFO_EXTENSION);
 				if($extension=="json") {
 					$dKey=str_replace(".json", '', $fx);
-					$dKey = $dKey;
 					$dashConfig=[
 								"title"=>_ling(toTitle($dKey)),
+								"category"=>_ling("General"),
 								"source"=>$file,
 								"active"=>0,
 							];
@@ -267,6 +270,34 @@ if(!function_exists("getDefaultDashletConfig")) {
 					}
 					if(checkUserRoles("DASHBOARD","Dashlets",$dKey)) {
 						$dashlets[$dKey]=$dashConfig;
+					}
+				} elseif(is_dir($file)) {
+					$fs1=scandir($file);
+					$fs1=array_splice($fs1,2);
+					foreach ($fs1 as $fx1) {
+						if(substr($fx1,0,1)=="~") continue;
+						$file1=$file."/".$fx1;
+						$extension = pathinfo($file1, PATHINFO_EXTENSION);
+						if($extension=="json") {
+							$dKey=basename($file)."/".str_replace(".json", '', $fx1);
+							$title = explode("/", $dKey);
+							$dashConfig=[
+										"title"=>_ling(toTitle(end($title))),
+										"category"=>_ling(toTitle(basename($file))),
+										"source"=>$file1,
+										"active"=>0,
+									];
+							if(array_key_exists($dKey, $loadedDashlets)) {
+								$dashConfig['active']=$loadedDashlets[$dKey];
+							}
+							if(checkUserRoles("DASHBOARD","Dashlets",$dKey)) {
+								if($flatList) {
+									$dashlets[$dKey]=$dashConfig;
+								} else {
+									$dashlets[basename($file)][$dKey]=$dashConfig;
+								}
+							}
+						}
 					}
 				}
 			}

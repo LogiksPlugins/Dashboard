@@ -115,7 +115,7 @@ switch($_REQUEST["action"]) {
 
 	case "dashletInfo":
 		if(isset($_REQUEST['d'])) {
-			$dashlets=listDashlets();
+			$dashlets=listDashlets(false,true);
 			if(array_key_exists($_REQUEST['d'],$dashlets)) {
 				$cfg=$dashlets[$_REQUEST['d']];
 				$src=$cfg['source'];
@@ -166,13 +166,17 @@ switch($_REQUEST["action"]) {
 	case "addDashlets":
 		if(isset($_REQUEST['d'])) {
 			$dxs=explode(",", $_REQUEST['d']);
-			$dashlets=listDashlets();
+			$dashlets=listDashlets(false,true);
 
 			foreach ($dxs as $d) {
 				if(array_key_exists($d,$dashlets)) {
 					$cfg=$dashlets[$d];
 					$src=$cfg['source'];
 					$json=json_decode(file_get_contents($src),true);
+
+					if(strpos($d, "/")) {
+						$json['folder'] = current(explode("/", $d));
+					}
 
 					$dashkey=md5(basename($src).time());
 
