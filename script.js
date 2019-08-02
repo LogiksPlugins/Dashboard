@@ -61,7 +61,7 @@ $(function() {
 		saveDashletState(dashkey, attrName, attrValue);
 	});
 
-	$("#dashboardContainer").sortable({
+	$("#dashboardContainer.withDND").sortable({
 		connectWith: "#dashboardContainer",
 		scroll: true,
 		opacity: 0.6,

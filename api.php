@@ -2,17 +2,89 @@
 if(!defined('ROOT')) exit('No direct script access allowed');
 
 if(!function_exists("getDefaultDashletConfig")) {
-  function setDashData($dataSource) {
-    $key=md5(time().rand(0,100000));
-    $_SESSION['DASHDATA'][$key]=$dataSource;
-    return $key;
-  }
-  function getDashData($key) {
-    if(isset($_SESSION['DASHDATA']) && isset($_SESSION['DASHDATA'][$key])) {
-      return $_SESSION['DASHDATA'][$key];
-    }
-    return false;
-  }
+
+	function processDashboardConfig($dashboardConfig = []) {
+		if($dashboardConfig==null || !is_array($dashboardConfig)) $dashboardConfig = [];
+		
+		//Initiating default variables
+		if(!isset($dashboardConfig['params'])) $dashboardConfig['params'] = [];
+		if(!isset($dashboardConfig['order'])) $dashboardConfig['order'] = [];
+		if(!isset($dashboardConfig['dashlets'])) $dashboardConfig['dashlets'] = [];
+
+		if(!isset($dashboardConfig['preload'])) {
+			$dashboardConfig['preload']=["module"=>[],"css"=>[],"js"=>[]];
+		}
+		if(!isset($dashboardConfig['preload']['css'])) {
+			$dashboardConfig['preload']['css'] = [];
+		}
+		if(!isset($dashboardConfig['preload']['js'])) {
+			$dashboardConfig['preload']['js'] = [];
+		}
+		if(!isset($dashboardConfig['preload']['module'])) {
+			$dashboardConfig['preload']['module'] = [];
+		}
+
+		//Populating default variables
+		$dashboardConfig['params'] = array_merge([
+				"background"=> "",
+				"force_span"=> "",
+				"force_style"=> "",
+				"force_open"=> "",
+				"allow_dnd"=>true,
+				"allow_server_messages"=> true,
+				"allow_closing"=> false,
+				"allow_controller"=> true,
+				"dashlet_allow_minimize"=>true,
+				"dashlet_allow_focus"=>true,
+				"dashlet_allow_closing"=> true,
+				"dashlet_allow_configure"=> true,
+				"dashlet_header"=>true
+			], $dashboardConfig['params']);
+
+		if(!isset($dashboardConfig['order']) || count($dashboardConfig['order'])<=0 || 
+			(count($dashboardConfig['order'])==1 && strlen($dashboardConfig['order'][0])<=0)) {
+			$dashboardConfig['order']=array_keys($dashboardConfig['dashlets']);
+		}
+
+		$dashboardConfig['preload']['css'][]="dashboard";
+		$dashboardConfig['preload']['js'][]="dashboard";
+		$dashboardConfig['preload']['js'][]="jquery.alterclass";
+
+		foreach ($dashboardConfig['dashlets'] as $key => $dashlet) {
+			if(isset($dashlet['preload'])) {
+				if(isset($dashlet['preload']['module'])) {
+					if(!is_array($dashlet['preload']['module'])) $dashlet['preload']['module']=explode(",", $dashlet['preload']['module']);
+					$dashboardConfig['preload']['module']=array_merge($dashboardConfig['preload']['module'],$dashlet['preload']['module']);
+				}
+				if(isset($dashlet['preload']['css'])) {
+					if(!is_array($dashlet['preload']['css'])) $dashlet['preload']['css']=explode(",", $dashlet['preload']['css']);
+					$dashboardConfig['preload']['css']=array_merge($dashboardConfig['preload']['css'],$dashlet['preload']['css']);
+				}
+				if(isset($dashlet['preload']['js'])) {
+					if(!is_array($dashlet['preload']['js'])) $dashlet['preload']['js']=explode(",", $dashlet['preload']['js']);
+					$dashboardConfig['preload']['js']=array_merge($dashboardConfig['preload']['js'],$dashlet['preload']['js']);
+				}
+			}
+		}
+
+		$dashboardConfig['preload']['module']=array_unique($dashboardConfig['preload']['module']);
+		$dashboardConfig['preload']['css']=array_unique($dashboardConfig['preload']['css']);
+		$dashboardConfig['preload']['js']=array_unique($dashboardConfig['preload']['js']);
+
+		return $dashboardConfig;
+	}
+	
+	function setDashData($dataSource) {
+	    $key=md5(time().rand(0,100000));
+	    $_SESSION['DASHDATA'][$key]=$dataSource;
+	    return $key;
+	}
+  	function getDashData($key) {
+	    if(isset($_SESSION['DASHDATA']) && isset($_SESSION['DASHDATA'][$key])) {
+	      return $_SESSION['DASHDATA'][$key];
+	    }
+	    return false;
+  	}
 	function getDefaultDashletConfig() {
 		return [
 				"title"=>"",
@@ -30,14 +102,20 @@ if(!function_exists("getDefaultDashletConfig")) {
 				],
 				"type"=>false,
 				"source"=>false,
-				"config"=>[],
-				"schema"=>[],
+				
+				"config"=>[],				//Editable fields
+				"schema"=>[],				//Form schema
+
 				"column"=>6,
 				"forcenewrow"=>false,
 				"header"=>true,
 				"footer"=>false,
 				"active"=>true,
-				"containerClass"=>""
+				"containerClass"=>"",
+
+				// "autoOpen"=> true,
+				// "style"=> "",
+				// "styleContent"=> "text-align:center%3B",
 			];
 	}
 
@@ -89,7 +167,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 		return $html;
 	}
 
-	function printDashlet($dashkey, $dashletConfig) {
+	function printDashlet($dashkey, $dashletConfig, $dashboardConfig) {
 		$dashlet=array_merge(getDefaultDashletConfig(),$dashletConfig);
 		if(!checkUserRoles("DASHBOARD","Dashlets",$dashlet['source'])) {
 			return false;
@@ -97,15 +175,27 @@ if(!function_exists("getDefaultDashletConfig")) {
 		?>
 			<div data-dashkey='<?=$dashkey?>' class='dashletContainer col-xs-12 col-sm-12 col-md-<?=$dashlet['column']?> col-lg-<?=$dashlet['column']?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>'>
 				<div class="dashletPanel <?=$dashlet['active']?"active":''?> panel panel-default ajaxloading ajaxloading8">
+					<?php if($dashboardConfig['params']['dashlet_header'] && $dashlet['header']) { ?>
 					<?php if($dashlet['header']===true) { ?>
 					<div class="panel-heading">
-						<div class="dashletOption dashletHandle glyphicon <?=$dashlet['active']?"glyphicon-triangle-top":'glyphicon-triangle-bottom'?> pull-left"></div>
-
+						<?php if($dashboardConfig['params']['dashlet_allow_closing']) { ?>
 						<div class="dashletOption dashletRemove glyphicon glyphicon-remove pull-right" cmd='remove'></div>
+						<?php } ?>
+						<?php if($dashboardConfig['params']['dashlet_allow_configure']) { ?>
 						<div class="dashletOption dashletSettings glyphicon glyphicon-cog pull-right" cmd='settings'></div>
+						<?php } ?>
+						<?php if($dashboardConfig['params']['dashlet_allow_focus']) { ?>
 						<div class="dashletOption dashletFocus glyphicon glyphicon-eye-open pull-right" cmd='focus'></div>
+						<?php } ?>
 
+						<?php if($dashboardConfig['params']['dashlet_allow_minimize']) { ?>
+						<div class="dashletOption dashletHandle glyphicon <?=$dashlet['active']?"glyphicon-triangle-top":'glyphicon-triangle-bottom'?> pull-left"></div>
 						<h3 class="panel-title"><?=_ling($dashlet['title'])?></h3>
+						<?php } else { ?>
+						<h3 class="panel-title panel-title-nominimize"><?=_ling($dashlet['title'])?></h3>
+						<?php } ?>
+
+						
 					</div>
 					<?php 
 						} elseif(is_file(APPROOT.$dashlet['header'])) { 
@@ -118,7 +208,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 							echo '</div>';
 						} 
 					?>
-					
+					<?php } ?>
 					<div class="panel-body">
 					<?php 
 						if(!isset($dashlet['config'])) $dashlet['config']=[];

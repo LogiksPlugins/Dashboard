@@ -39,9 +39,15 @@
 }
 .dashletPanel .panel-heading .panel-title {
 	padding-left: 15px;
+	cursor: default;
+}
+.withDND .dashletPanel .panel-heading .panel-title {
 	cursor: move;
 }
-
+.dashletPanel .panel-heading .panel-title.panel-title-nominimize {
+	padding-left: 0px;
+    margin-left: -8px;
+}
 .dashletPanel .panel-heading .dashletOption {
 	cursor: pointer;
 	color: #666;
