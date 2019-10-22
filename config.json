@@ -6,7 +6,7 @@
 		"force_open": "",
 		"allow_dnd": true,
 		"allow_server_messages": true,
-		"allow_controller": false,
+		"allow_controller": true,
 		"dashlet_allow_minimize": true,
 		"dashlet_allow_focus": true,
 		"dashlet_allow_closing": true,
