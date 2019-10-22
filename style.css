@@ -211,10 +211,18 @@
 	bottom: 10px;
 	cursor: pointer;
 }
-.dashboardSettingsIcon:hover {
-	opacity: 0.5;
+
+.dashboardSaveIcon {
+	font-size: 2em;
+    position: absolute;
+    right: 45px;
+    bottom: 10px;
+    cursor: pointer;
 }
 
+.dashboardSettingsIcon:hover, .dashboardSaveIcon:hover {
+	opacity: 0.5;
+}
 
 #dashboardSettingsModal {
 

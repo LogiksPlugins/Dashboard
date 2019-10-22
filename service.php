@@ -96,7 +96,41 @@ switch($_REQUEST["action"]) {
 			trigger_error("New Order not found.");
 		}
 	break;
-
+	case "saveDashletNew":
+		if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
+			if(isset($_POST['dashkey']) && strlen($_POST['dashkey'])>0) {
+				$dashFile = APPROOT."misc/dashboards/{$_POST['dashkey']}.json";
+				
+				$dashboardConfig['order']=explode(",", $_POST['neworder']);
+				
+				if(count($dashboardConfig['order'])==1 && strlen($dashboardConfig['order'][0])<=0) {
+					$dashboardConfig['order']=[];
+				}
+	
+				foreach ($dashboardConfig['dashlets'] as $dashkey => $dashlet) {
+					if(!in_array($dashkey, $dashboardConfig['order'])) {
+						unset($dashboardConfig['dashlets'][$dashkey]);
+					}
+				}
+				if(!is_dir(dirname($dashFile))) {
+					mkdir(dirname($dashFile),0777,true);
+				}
+				//setUserConfig("dashboard-".SITENAME,$dashboardConfig);
+				printArray([$dashFile,$dashboardConfig]);
+				$a = file_put_contents($dashFile, json_encode($dashboardConfig,JSON_PRETTY_PRINT));
+	
+				if($a>1) {
+					printServiceMSG(array("status"=>"success","msg"=>"Successfully updated dashboard :  {$_POST['dashkey']}"));
+				} else {
+					trigger_error("Error saving dashboard : {$_POST['dashkey']}");
+				}
+			} else {
+				trigger_error("New Name not found.");
+			}
+		} else {
+			trigger_error("Dashboard updating is available only in development mode");
+		}
+	break;
 	case "listDashlets":
 		$dashlets=listDashlets();
 		foreach($dashlets as $a=>$b) {

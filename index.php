@@ -13,23 +13,29 @@ if(isset($_GET['dashkey']) && strlen($_GET['dashkey'])>0) {
 	$dashkey = $slugs['dboard'];
 }
 
+$dashFile = false;
 if($dashkey) {
 	$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json";
-	if(is_file($dashFile)) {
-		$dashboardConfig=json_decode(file_get_contents($dashFile),true);
-		if(!$dashboardConfig) {
-			echo "<h1 align=center>"._ling("Sorry, Dashboard not found")."</h1>";
-			return;
-		}
-		if(!isset($dashboardConfig['access']) || $dashboardConfig['access']!="public") {
-			if(!checkUserRoles("DASHBOARD","Boards",$dashkey)) {
-				echo "<h1 align=center>"._ling("Sorry, you don't have permission for accessing this Dashboard")."</h1>";
-				return;
-			}
-		}
-	} else {
+	
+	if(!is_file($dashFile)) {
 		echo "<h1 align=center>"._ling("Sorry, Dashboard not configured yet")."</h1>";
 		return;
+	}
+} elseif(isset($_SESSION['SESS_PRIVILEGE_NAME'])) {
+	$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}.json";
+}
+
+if($dashFile && is_file($dashFile)) {
+	$dashboardConfig=json_decode(file_get_contents($dashFile),true);
+	if(!$dashboardConfig) {
+		echo "<h1 align=center>"._ling("Sorry, Dashboard not found")."</h1>";
+		return;
+	}
+	if(!isset($dashboardConfig['access']) || $dashboardConfig['access']!="public") {
+		if(!checkUserRoles("DASHBOARD","Boards",$dashkey)) {
+			echo "<h1 align=center>"._ling("Sorry, you don't have permission for accessing this Dashboard")."</h1>";
+			return;
+		}
 	}
 } else {
 	if(isset($_GET['debug']) && $_GET['debug']=="true") {
@@ -41,7 +47,7 @@ if($dashkey) {
 
 $dashboardConfig = processDashboardConfig($dashboardConfig);
 
-//$dashboardConfig['params']['allow_controller']=0;
+$dashboardConfig['params']['allow_controller']=1;
 //echo json_encode($dashboardConfig);
 // printArray($dashboardConfig);return;
 
@@ -63,6 +69,9 @@ echo _js($dashboardConfig['preload']['js']);
 		if($dashboardConfig['params']['allow_controller']) {
 			echo "<i class='fa fa-cog dashboardSettingsIcon'></i>";
 			include __DIR__."/settings.php";
+		}
+		if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
+			echo "<i class='fa fa-save dashboardSaveIcon development'></i>";
 		}
 	?>
 </div>

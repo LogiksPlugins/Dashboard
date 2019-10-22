@@ -1,3 +1,5 @@
+var currentDashboardSavekey = null;
+
 $(function() {
 	$("#dashboardContainer .dashletPanel.ajaxloading").removeClass("ajaxloading8").removeClass("ajaxloading");
 
@@ -9,6 +11,34 @@ $(function() {
 		$('#dashboardSettingsModal').modal({
 			  keyboard: false
 			});
+	});
+	
+	$(".dashboardContainer").delegate(".dashboardSaveIcon","click",function(e) {
+		e.preventDefault();
+
+		if($(this).hasClass("development")) {
+			if(currentDashboardSavekey==null) {
+				lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
+		    			if(ans) {
+		    				currentDashboardSavekey = ans;
+		    				save_dashboard(currentDashboardSavekey);
+		    			}
+					});
+			} else {
+				lgksConfirm("Do you want to update current dashboard <b style='font-size:20px'>"+currentDashboardSavekey+"</b><br><br> Press cancel to create new Dashboard !", "Save Dashboard", function(ans1) {
+				    if(ans1) {
+				        save_dashboard(currentDashboardSavekey);
+				    } else {
+				        lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
+				    			if(ans) {
+				    				currentDashboardSavekey = ans;
+				    				save_dashboard(currentDashboardSavekey);
+				    			}
+							});
+				    }
+				})
+			}
+		}
 	});
 
 	$("#dashboardContainer").delegate(".dashletPanel .dashletOption.dashletHandle","click",function(e) {
@@ -166,4 +196,22 @@ function change_forcenewrow(dashlet,attrValue) {
 }
 function change_active(dashlet,attrValue) {
 	
+}
+
+function save_dashboard(dashcode) {
+	q=[];
+	$(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
+	lx=_service("dashboard","saveDashletNew");
+	processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashkey="+dashcode,function(txt) {
+		try {
+			json=$.parseJSON(txt);
+			if(json.error!=null) {
+				lgksToast(json.error.msg);
+			} else if(json.Data.msg!=null) {
+				lgksToast(json.Data.msg);
+			}
+		} catch(e) {
+			console.error(e);
+		}
+	});
 }
