@@ -10,7 +10,11 @@ $dashkey = false;
 if(isset($_GET['dashkey']) && strlen($_GET['dashkey'])>0) {
 	$dashkey = $_GET['dashkey'];
 } elseif(strlen($slugs['dboard'])>0) {
-	$dashkey = $slugs['dboard'];
+	if($slugs['dboard']=="dashboard" && strlen($slugs['b'])>0) {
+		$dashkey = $slugs['b'];
+	} else {
+		$dashkey = $slugs['dboard'];
+	}
 }
 
 $dashFile = false;
