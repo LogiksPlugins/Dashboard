@@ -20,9 +20,15 @@ if(isset($_GET['dashkey']) && strlen($_GET['dashkey'])>0) {
 $dashFile = false;
 if($dashkey) {
 	$dashkey = str_replace(".","/",$dashkey);
-	$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json";
+	$dashFile = false;
 	
-	if(!is_file($dashFile)) {
+	if(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json")) {
+		$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json";
+	} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json")) {
+		$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json";
+	} elseif(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json")) {
+		$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json";
+	} else {
 		echo "<h1 align=center>"._ling("Sorry, Dashboard not configured yet")."</h1>";
 		return;
 	}
