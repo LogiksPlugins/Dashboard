@@ -41,6 +41,12 @@ $(function() {
 		}
 	});
 
+	$(".dashboardContainer").delegate(".dashboardDevIcon","click",function(e) {
+		e.preventDefault();
+
+		clear_dashboard();
+	});
+
 	$("#dashboardContainer").delegate(".dashletPanel .dashletOption.dashletHandle","click",function(e) {
 		e.preventDefault();
 
@@ -214,4 +220,8 @@ function save_dashboard(dashcode) {
 			console.error(e);
 		}
 	});
+}
+
+function clear_dashboard() {
+	
 }
