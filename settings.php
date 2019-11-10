@@ -1,3 +1,6 @@
+<?php
+if(!defined('ROOT')) exit('No direct script access allowed');
+?>
 <div id="dashboardSettingsModal" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -8,14 +11,84 @@
 		  	</div>
 		  </div>
 		  <div class="modal-body">
-			  <div class="row noinfo nowMargin">
-			  		<div class="dashletList list-group col-md-4">
-					</div>
-					<div class='dashletInfo col-md-8'>
-						
-					</div>
-			  </div>
+		  		<?php
+		  			if(strtolower(getConfig("APPS_STATUS"))=="production" || strtolower(getConfig("APPS_STATUS"))=="prod") {
+		  				?>
+		  				<div class="row noinfo nowMargin">
+					  		<div class="dashletList list-group col-md-4">
+							</div>
+							<div class='dashletInfo col-md-8'>
+								
+							</div>
+					  	</div>
+		  				<?php
+		  			} else {
+		  				?>
+		  				<div class="row noinfo nowMargin">
+			  				<ul class="nav nav-tabs">
+							  <li class="active"><a data-toggle="tab" href="#dashletList">Dashlets</a></li>
+							  <li><a data-toggle="tab" href="#dashConfigure">Configure</a></li>
+							</ul>
+							<div class="tab-content">
+							  <div id="dashletList" class="tab-pane fade in active">
+							    <div class="row">
+							  		<div class="dashletList list-group col-md-4">
+									</div>
+									<div class='dashletInfo col-md-8'>
+										
+									</div>
+							  	</div>
+							  </div>
+							  <div id="dashConfigure" class="tab-pane fade">
+							  	<?php if(isset($dashboardConfig['params'])) { ?>
+							    <div class="well">
+							    	<form id='dashboardConfigureForm' class="form-horizontal">
+									  <?php
+									  	foreach ($dashboardConfig['params'] as $key => $value) {
+									  		$title = _ling(toTitle($key));
 
+									  		if(is_bool($value) || (is_integer($value) && $value===1) || (is_integer($value) && $value===0)) {
+									  			$checked1 = $value?"checked=checked":"";
+									  			$checked2 = $value?"":"checked=checked";
+									  			echo "<div class='form-group'>
+												    <label class='control-label col-sm-4'>{$title}:</label>
+												    <div class='col-sm-8'>
+												      <label>
+												      	<input type='radio' class='form-control' name='{$key}' value='true' {$checked1}>
+												      	 True
+												      </label>
+												      <label>
+												      	<input type='radio' class='form-control' name='{$key}' value='false' {$checked2}>
+												      	 False
+												      </label>
+												    </div>
+												  </div>";
+									  		} else {
+									  			echo "<div class='form-group'>
+												    <label class='control-label col-sm-4' for='{$key}'>{$title}:</label>
+												    <div class='col-sm-8'>
+												      <input type='text' class='form-control' id='{$key}' name='{$key}' placeholder='Enter {$title}' value='{$value}'>
+												    </div>
+												  </div>";
+									  		}
+									  	}
+									  ?>
+									  <div class="form-group">
+									    <div class="col-sm-offset-2 col-sm-10">
+									      <button type="submit" class="btn btn-success">Update</button>
+									    </div>
+									  </div>
+									</form>
+							    </div>
+							<?php } else { ?>
+								<h2 align="center">No parameters to configure</h2>
+							<?php } ?>
+							  </div>
+							</div>
+						</div>
+		  				<?php
+		  			}
+		  		?>
 		  </div>
 		  <div class="modal-footer">
 		  	<button type="button" class="btn btn-info pull-left"  onclick="loadDashletList(true)">Refresh List</button>
@@ -54,6 +127,12 @@ $(function() {
 			}).show();
 		}
 	});
+
+	$("form#dashboardConfigureForm").submit(function() {
+		saveDashboardParams();
+		$("form#dashboardConfigureForm")
+		return false;
+	});
 });
 
 function loadDashletList(relist) {
@@ -77,6 +156,7 @@ function loadDashletList(relist) {
 					if(v.title==null) {
 						if(Object.keys(v).length>0) {
 							$.each(v,function(k1,v1) {
+								v1.active = 0;
 								html1="<div class='list-group-item' data-key='"+k1+"'>";
                                 if(v.active!=null && v.active>0) {
                                     html1+="<span><i class='fa fa-info-circle'></i> &nbsp;"+v1.title+" ["+v1.active+"]</span>";
@@ -133,8 +213,8 @@ function updateDashletAddition() {
 		q.push(dk);
 	});
 
-	lx=_service("dashboard","addDashlets")+"&d="+q.join(",");
-	processAJAXQuery(lx,function(txt) {
+	lx=_service("dashboard","addDashlets")+"&dboard="+$(".dashboardContainer").data("dashboard");
+	processAJAXPostQuery(lx,"d="+q.join(","),function(txt) {
 		$(".dashletList .list-group-item .ajaxloading").detach();
 
 		try {
@@ -145,9 +225,13 @@ function updateDashletAddition() {
 		} catch(e) {
 			console.error(e);
 		}
-		
+	});
+}
 
-		
+function saveDashboardParams() {
+	lx=_service("dashboard","saveBoardParams")+"&dboard="+$(".dashboardContainer").data("dashboard");
+	processAJAXPostQuery(lx,$("form#dashboardConfigureForm").serialize(),function(txt) {
+		lgksToast("Dashboard configured successfully");
 	});
 }
 </script>

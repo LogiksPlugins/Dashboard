@@ -17,34 +17,30 @@ $(function() {
 		e.preventDefault();
 
 		if($(this).hasClass("development")) {
-			if(currentDashboardSavekey==null) {
-				lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
-		    			if(ans) {
-		    				currentDashboardSavekey = ans;
-		    				save_dashboard(currentDashboardSavekey);
-		    			}
-					});
-			} else {
-				lgksConfirm("Do you want to update current dashboard <b style='font-size:20px'>"+currentDashboardSavekey+"</b><br><br> Press cancel to create new Dashboard !", "Save Dashboard", function(ans1) {
-				    if(ans1) {
-				        save_dashboard(currentDashboardSavekey);
-				    } else {
-				        lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
-				    			if(ans) {
-				    				currentDashboardSavekey = ans;
-				    				save_dashboard(currentDashboardSavekey);
-				    			}
-							});
-				    }
-				})
-			}
+			save_dashboard($(".dashboardContainer").data("dashboard"));
+
 		}
 	});
 
-	$(".dashboardContainer").delegate(".dashboardDevIcon","click",function(e) {
+	$(".dashboardContainer").delegate(".dashboardSaveAsIcon","click",function(e) {
 		e.preventDefault();
 
-		clear_dashboard();
+		if($(this).hasClass("development")) {
+			save_as_dashboard();
+
+		}
+	});
+
+	$(".dashboardContainer").delegate(".dashboardNewIcon","click",function(e) {
+		e.preventDefault();
+
+		createNewdashboard();
+	});
+
+	$(".dashboardContainer").delegate(".dashboardResetIcon","click",function(e) {
+		e.preventDefault();
+
+		resetdashboard();
 	});
 
 	$("#dashboardContainer").delegate(".dashletPanel .dashletOption.dashletHandle","click",function(e) {
@@ -149,7 +145,7 @@ function dashboardAction(cmd, dashlet) {
 function saveDashletOrder() {
 	q=[];
 	$(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
-	lx=_service("dashboard","saveDashletOrder");
+	lx=_service("dashboard","saveDashletOrder","json","&dboard="+$(".dashboardContainer").data("dashboard"));
 	processAJAXPostQuery(lx,"neworder="+q.join(","),function(txt) {
 		try {
 			json=$.parseJSON(txt);
@@ -163,7 +159,7 @@ function saveDashletOrder() {
 }
 
 function saveDashletState(dashkey, attrName, attrValue) {
-	lx=_service("dashboard","saveDashletState");
+	lx=_service("dashboard","saveDashletState","json","&dboard="+$(".dashboardContainer").data("dashboard"));
 	q=["dashkey="+dashkey,attrName+"="+attrValue];
 	processAJAXPostQuery(lx,q.join("&"),function(txt) {
 		try {
@@ -205,23 +201,79 @@ function change_active(dashlet,attrValue) {
 }
 
 function save_dashboard(dashcode) {
-	q=[];
-	$(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
-	lx=_service("dashboard","saveDashletNew");
-	processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashkey="+dashcode,function(txt) {
-		try {
-			json=$.parseJSON(txt);
-			if(json.error!=null) {
-				lgksToast(json.error.msg);
-			} else if(json.Data.msg!=null) {
-				lgksToast(json.Data.msg);
-			}
-		} catch(e) {
-			console.error(e);
+    lgksConfirm("This will save the current dashboard into : "+ dashcode, "Save Dashboard !",function(ans) {
+        if(ans) {
+            q=[];
+            $(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
+            lx=_service("dashboard","saveDashletFile","json","&dboard="+$(".dashboardContainer").data("dashboard"));
+            processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashcode="+dashcode,function(txt) {
+                try {
+                    json=$.parseJSON(txt);
+                    if(json.error!=null) {
+                        lgksToast(json.error.msg);
+                    } else if(json.Data.msg!=null) {
+                        lgksToast(json.Data.msg);
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            });
+        }
+    });
+}
+
+function save_as_dashboard() {
+	lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
+		if(ans) {
+			ans = ans.replace(/[^a-z0-9]+|\s+/gmi, " ").trim().replace(" ",".");
+			newDashCode = ans;
+			q=[];
+            $(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
+            lx=_service("dashboard","saveDashletFile","json","&dboard="+newDashCode);
+            processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashcode="+newDashCode,function(txt) {
+                try {
+                    json=$.parseJSON(txt);
+                    if(json.error!=null) {
+                        lgksToast(json.error.msg);
+
+                        if(typeof openLinkFrame == "function") {
+			            	openLinkFrame("Edit-"+newDashCode,_link("modules/dashboard/"+newDashCode));
+						} else if(typeof top['openLinkFrame'] == "function") {
+							top.openLinkFrame("Edit-"+newDashCode,_link("modules/dashboard/"+newDashCode));
+						} else {
+							window.open(_link("modules/dashboard/"+newDashCode));
+						}
+                    } else if(json.Data.msg!=null) {
+                        lgksToast(json.Data.msg);
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            });
 		}
 	});
 }
 
-function clear_dashboard() {
-	
+function resetdashboard() {
+	lx=_service("dashboard","resetDashlet","json","&dboard="+$(".dashboardContainer").data("dashboard"));
+	processAJAXQuery(lx,function(txt) {
+// 		window.location.reload();
+		$(".dashletContainer").detach();
+	});
+}
+
+function createNewdashboard() {
+	lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
+		if(ans) {
+			ans = ans.replace(/[^a-z0-9]+|\s+/gmi, " ").trim().replace(" ",".");
+			newDashCode = ans;
+			if(typeof openLinkFrame == "function") {
+            	openLinkFrame("Edit-"+newDashCode,_link("modules/dashboard/"+newDashCode));
+			} else if(typeof top['openLinkFrame'] == "function") {
+				top.openLinkFrame("Edit-"+newDashCode,_link("modules/dashboard/"+newDashCode));
+			} else {
+				window.open(_link("modules/dashboard/"+newDashCode));
+			}
+		}
+	});
 }

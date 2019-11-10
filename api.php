@@ -3,6 +3,35 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 
 if(!function_exists("getDefaultDashletConfig")) {
 
+	function findDashboardFile($dashkey) {
+		$dashFile = false;
+		if($dashkey) {
+			$dashkey = str_replace(".","/",$dashkey);
+			$dashFile = false;
+			
+			if(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json")) {
+				$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json";
+			} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json")) {
+				$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json";
+			} elseif(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json")) {
+				$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json";
+			} else {
+				// echo "<h1 align=center>"._ling("Sorry, Dashboard not configured yet")."</h1>";
+				return false;
+			}
+		} elseif(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}.json")) {
+			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}.json";
+		} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/default.json")) {
+			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/default.json";
+		}
+
+		if($dashFile && is_file($dashFile)) {
+			return $dashFile;
+		} else {
+			return false;
+		}
+	}
+
 	function processDashboardConfig($dashboardConfig = []) {
 		if($dashboardConfig==null || !is_array($dashboardConfig)) $dashboardConfig = [];
 		
@@ -27,12 +56,12 @@ if(!function_exists("getDefaultDashletConfig")) {
 		//Populating default variables
 		$dashboardConfig['params'] = array_merge([
 				"background"=> "",
-				"force_span"=> "",
 				"force_style"=> "",
-				"force_open"=> "",
+				"force_span"=> "",
+			"force_open"=> "",
+			//"allow_server_messages"=> true,
+			"allow_closing"=> false,
 				"allow_dnd"=>true,
-				"allow_server_messages"=> true,
-				"allow_closing"=> false,
 				"allow_controller"=> true,
 				"dashlet_allow_minimize"=>true,
 				"dashlet_allow_focus"=>true,
@@ -107,6 +136,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 				"schema"=>[],				//Form schema
 
 				"column"=>6,
+				"column-lg"=>"",
 				"forcenewrow"=>false,
 				"header"=>true,
 				"footer"=>false,
@@ -172,8 +202,15 @@ if(!function_exists("getDefaultDashletConfig")) {
 		if(!checkUserRoles("DASHBOARD","Dashlets",$dashlet['source'])) {
 			return false;
 		}
+		if(!isset($dashlet['column-lg']) || strlen($dashlet['column-lg'])<=0) {
+			$dashlet['column-lg'] = $dashlet['column'];
+		}
+		$spanClass = "col-xs-12 col-sm-12 col-md-{$dashlet['column']} col-lg-{$dashlet['column-lg']}";
+		if(isset($dashboardConfig['params']['force_span']) && strlen($dashboardConfig['params']['force_span'])>0) {
+			$spanClass = $dashboardConfig['params']['force_span'];
+		}
 		?>
-			<div data-dashkey='<?=$dashkey?>' class='dashletContainer col-xs-12 col-sm-12 col-md-<?=$dashlet['column']?> col-lg-<?=$dashlet['column']?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>'>
+			<div data-dashkey='<?=$dashkey?>' class='dashletContainer <?=$spanClass?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>'>
 				<div class="dashletPanel <?=$dashlet['active']?"active":''?> panel panel-default ajaxloading ajaxloading8">
 					<?php if($dashboardConfig['params']['dashlet_header'] && $dashlet['header']) { ?>
 					<?php if($dashlet['header']===true) { ?>
@@ -194,8 +231,6 @@ if(!function_exists("getDefaultDashletConfig")) {
 						<?php } else { ?>
 						<h3 class="panel-title panel-title-nominimize"><?=_ling($dashlet['title'])?></h3>
 						<?php } ?>
-
-						
 					</div>
 					<?php 
 						} elseif(is_file(APPROOT.$dashlet['header'])) { 

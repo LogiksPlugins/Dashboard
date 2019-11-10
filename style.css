@@ -200,30 +200,46 @@
 	max-height: 100%;
 }
 
-
-
-
-/*Dashboard Settings Window*/
-.dashboardSettingsIcon {
-	font-size: 2em;
-	position: absolute;
-	right: 10px;
-	bottom: 10px;
-	cursor: pointer;
+.dashboardName {
+    font-size: 11px;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    cursor: pointer;
+    font-weight: bolder;
+    color: #666;
 }
 
-.dashboardSaveIcon {
+/*Dashboard Icons*/
+.dashboardSetupIcon {
 	font-size: 2em;
     position: absolute;
-    right: 45px;
     bottom: 10px;
     cursor: pointer;
 }
-
-.dashboardSettingsIcon:hover, .dashboardSaveIcon:hover {
+.dashboardSetupIcon:hover {
 	opacity: 0.5;
 }
 
+
+.dashboardSettingsIcon {
+	right: 10px;
+}
+.dashboardSaveAsIcon {
+	right: 45px;
+}
+.dashboardSaveIcon {
+	right: 75px;
+}
+.dashboardNewIcon {
+	right: 105px;
+}
+.dashboardResetIcon {
+	right: 135px;
+}
+
+
+/*Dashboard Settings Window*/
 #dashboardSettingsModal {
 
 }

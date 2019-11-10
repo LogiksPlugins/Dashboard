@@ -2,23 +2,25 @@
 if(!defined('ROOT')) exit('No direct script access allowed');
 checkServiceSession();
 
+if(!isset($_GET['dboard']) || strlen($_GET['dboard'])<=0) $_GET['dboard'] = "default";
+
 include_once __DIR__."/api.php";
 
-$dashboardConfig=getUserConfig("dashboard-".SITENAME);
+$dashboardConfig=getUserConfig("dashboard-".SITENAME."-".$_GET['dboard']);
 
 switch($_REQUEST["action"]) {
   case "dashletData":
     if(isset($_POST['dashkey'])) {
-      $dashkey=$_POST['dashkey'];
-			unset($_POST['dashkey']);
-			if(isset($_SESSION['DASHDATA'][$dashkey])) {
-        $src=$_SESSION['DASHDATA'][$dashkey];
-        $srcData=processDataQuery($src);
-        
-        printServiceMSG($srcData);
-      }else {
-				trigger_error("Dashkey not in use. {$dashkey}");
-			}
+      	$dashkey=$_POST['dashkey'];
+		unset($_POST['dashkey']);
+		if(isset($_SESSION['DASHDATA'][$dashkey])) {
+	        $src=$_SESSION['DASHDATA'][$dashkey];
+	        $srcData=processDataQuery($src);
+	        
+	        printServiceMSG($srcData);
+	  	} else {
+			trigger_error("Dashkey not in use. {$dashkey}");
+		}
     } else {
 			trigger_error("Dashkey not found.");
 		}
@@ -41,7 +43,7 @@ switch($_REQUEST["action"]) {
 				$dashboardConfig['dashlets'][$dashkey]=$config;
 				
 				//printArray($dashboardConfig['dashlets'][$dashkey]);
-				setUserConfig("dashboard-".SITENAME,$dashboardConfig);
+				setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
 
 				printServiceMSG(array("status"=>"success","msg"=>"Successfully saved dashlet."));
 			} else {
@@ -53,26 +55,10 @@ switch($_REQUEST["action"]) {
 	break;
 
 	case "resetDashlet":
-		if(isset($_POST['dashkey'])) {
-			$dashkey=$_POST['dashkey'];
-			unset($_POST['dashkey']);
-			if(isset($dashboardConfig['dashlets'][$dashkey])) {
-				$config=$dashboardConfig['dashlets'][$dashkey];
-
-				
-
-				//$dashboardConfig['dashlets'][$dashkey]=$config;
-
-				//printArray($dashboardConfig['dashlets'][$dashkey]);
-				//setUserConfig("dashboard-".SITENAME,$dashboardConfig);
-
-				printServiceMSG(array("status"=>"success","msg"=>"Successfully saved dashlet."));
-			} else {
-				trigger_error("Dashkey not in use.");
-			}
-		} else {
-			trigger_error("Dashkey not found.");
-		}
+		$dashboardConfig['dashlets'] = [];
+		$dashboardConfig['order'] = [];
+		setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
+		printServiceMSG(array("status"=>"success","msg"=>"Reset successfull for dashboard"));
 	break;
 
 	case "saveDashletOrder":
@@ -89,17 +75,49 @@ switch($_REQUEST["action"]) {
 				}
 			}
 
-			setUserConfig("dashboard-".SITENAME,$dashboardConfig);
+			setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
 
 			printServiceMSG(array("status"=>"success","msg"=>"Successfully reordered dashboard."));
 		} else {
 			trigger_error("New Order not found.");
 		}
 	break;
-	case "saveDashletNew":
+	case "saveBoardParams":
 		if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
-			if(isset($_POST['dashkey']) && strlen($_POST['dashkey'])>0) {
-				$dashFile = APPROOT."misc/dashboards/{$_POST['dashkey']}.json";
+			if(isset($_POST['dashcode']) && strlen($_POST['dashcode'])>0) {
+				$_POST['dashcode'] = str_replace(".", "/", $_POST['dashcode']);
+				$dashFile = APPROOT."misc/dashboards/{$_POST['dashcode']}.json";
+
+				if(!file_exists($dashFile)) {
+					foreach ($_POST as $key => $value) {
+						if($value=="true" || $value=="false") $value=boolval($value);
+
+						if(isset($dashboardConfig['params'][$key])) {
+							$dashboardConfig['params'][$key] = $value;
+						}
+					}
+
+					$a = file_put_contents($dashFile, json_encode($dashboardConfig,JSON_PRETTY_PRINT));
+
+					setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
+
+					printServiceMSG(array("status"=>"success","msg"=>"Successfully updated dashboard :  {$_POST['dashcode']}"));
+				} else {
+					trigger_error("Dashboard config missing");
+				}
+			} else {
+				trigger_error("New Name not found");
+			}
+		} else {
+			trigger_error("Dashboard updating is available only in development mode");
+		}
+	break;
+	case "saveDashletNew":
+	case "saveDashletFile":
+		if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
+			if(isset($_POST['dashcode']) && strlen($_POST['dashcode'])>0) {
+				$_POST['dashcode'] = str_replace(".", "/", $_POST['dashcode']);
+				$dashFile = APPROOT."misc/dashboards/{$_POST['dashcode']}.json";
 				
 				$dashboardConfig['order']=explode(",", $_POST['neworder']);
 				
@@ -115,17 +133,17 @@ switch($_REQUEST["action"]) {
 				if(!is_dir(dirname($dashFile))) {
 					mkdir(dirname($dashFile),0777,true);
 				}
-				//setUserConfig("dashboard-".SITENAME,$dashboardConfig);
-				printArray([$dashFile,$dashboardConfig]);
+				//setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
+				//printArray([$dashFile,$dashboardConfig]);
 				$a = file_put_contents($dashFile, json_encode($dashboardConfig,JSON_PRETTY_PRINT));
 	
 				if($a>1) {
-					printServiceMSG(array("status"=>"success","msg"=>"Successfully updated dashboard :  {$_POST['dashkey']}"));
+					printServiceMSG(array("status"=>"success","msg"=>"Successfully updated dashboard :  {$_POST['dashcode']}"));
 				} else {
-					trigger_error("Error saving dashboard : {$_POST['dashkey']}");
+					trigger_error("Error saving dashboard : {$_POST['dashcode']}");
 				}
 			} else {
-				trigger_error("New Name not found.");
+				trigger_error("New Name not found");
 			}
 		} else {
 			trigger_error("Dashboard updating is available only in development mode");
@@ -220,8 +238,9 @@ switch($_REQUEST["action"]) {
 					$dashboardConfig['dashlets'][$dashkey]=$json;
 				}
 			}
-			setUserConfig("dashboard-".SITENAME,$dashboardConfig);
-			printServiceMSG(['status'=>"success","new"=>$dxs]);
+			setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
+
+			printServiceMSG(['status'=>"success","new"=>$dxs,"board"=>"dashboard-".SITENAME."-".$_GET['dboard']]);
 		} else {
 			trigger_error("Dashkey not found.");
 		}
