@@ -7,7 +7,13 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 		  <div class="modal-title" style='overflow: hidden;'>
 		  	<input type="search" name="searchDashboardDashlets" class='form-control search-dashlet pull-right' placeholder='Search ...' />
 		  	<div class="panel-heading">
-		  		Manage Dashlets
+		  		<?php
+		  			if(strtolower(getConfig("APPS_STATUS"))=="production" || strtolower(getConfig("APPS_STATUS"))=="prod") {
+		  				echo "Manage My Dashlets";
+		  			} else {
+		  				echo "Manage Dashlets : {$dboard}";
+		  			}
+		  		?>
 		  	</div>
 		  </div>
 		  <div class="modal-body">

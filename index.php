@@ -69,7 +69,7 @@ echo _js($dashboardConfig['preload']['js']);
 			include __DIR__."/settings.php";
 		}
 		if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
-			echo "<div class='dashboardName'>"."dashboard-".SITENAME."-".$dboard."</div>";
+			echo "<div class='dashboardName'>".$dboard."</div>";//."dashboard-".SITENAME."-"
 
 			echo "<i class='fa fa-copy dashboardSetupIcon dashboardSaveAsIcon development' title='Copy into new Dashboard'></i>";
 			echo "<i class='fa fa-refresh dashboardSetupIcon dashboardResetIcon development' title='Reset Dashboard'></i>";
