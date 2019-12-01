@@ -239,7 +239,13 @@ switch($_REQUEST["action"]) {
 				}
 			}
 			setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
-
+			
+			if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
+				$dashFile = findDashboardFile($_GET['dboard']);
+				if($dashFile) {
+					file_put_contents($dashFile, json_encode($dashboardConfig,JSON_PRETTY_PRINT));
+				}
+			}
 			printServiceMSG(['status'=>"success","new"=>$dxs,"board"=>"dashboard-".SITENAME."-".$_GET['dboard']]);
 		} else {
 			trigger_error("Dashkey not found.");

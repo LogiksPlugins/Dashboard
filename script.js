@@ -42,6 +42,12 @@ $(function() {
 
 		resetdashboard();
 	});
+	
+	$(".dashboardContainer").delegate(".dashboardEditIcon","click",function(e) {
+		e.preventDefault();
+
+		editdashboard();
+	});
 
 	$("#dashboardContainer").delegate(".dashletPanel .dashletOption.dashletHandle","click",function(e) {
 		e.preventDefault();
@@ -183,6 +189,7 @@ function saveDashletState(dashkey, attrName, attrValue) {
 
 function updateDashboard() {
 	window.location.reload();
+	//console.log("RELOAD CALLED");
 }
 
 //Specific Dashlet Support Functions
@@ -201,25 +208,57 @@ function change_active(dashlet,attrValue) {
 }
 
 function save_dashboard(dashcode) {
-    lgksConfirm("This will save the current dashboard into : "+ dashcode, "Save Dashboard !",function(ans) {
-        if(ans) {
-            q=[];
-            $(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
-            lx=_service("dashboard","saveDashletFile","json","&dboard="+$(".dashboardContainer").data("dashboard"));
-            processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashcode="+dashcode,function(txt) {
-                try {
-                    json=$.parseJSON(txt);
-                    if(json.error!=null) {
-                        lgksToast(json.error.msg);
-                    } else if(json.Data.msg!=null) {
-                        lgksToast(json.Data.msg);
-                    }
-                } catch(e) {
-                    console.error(e);
-                }
-            });
-        }
-    });
+	if(dashcode==null || dashcode.length<=0) {
+		lgksPrompt("Please give the name of the Dashboard.<br><citie style='font-size:10px;'>(No special characters, space allowed)</citie>","Name of Dashboard!", function(ans) {
+			if(ans) {
+				ans = ans.replace(/[^a-z0-9]+|\s+/gmi, " ").trim().replace(" ",".");
+				dashcode = ans;
+				
+				$(".dashboardContainer").data("dashboard",dashcode);
+				$("#dashboardNameBox").html(dashcode);
+				
+				lgksConfirm("This will save the current dashboard into : "+ dashcode, "Save Dashboard !",function(ans) {
+			        if(ans) {
+			            q=[];
+			            $(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
+			            lx=_service("dashboard","saveDashletFile","json","&dboard="+$(".dashboardContainer").data("dashboard"));
+			            processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashcode="+dashcode,function(txt) {
+			                try {
+			                    json=$.parseJSON(txt);
+			                    if(json.error!=null) {
+			                        lgksToast(json.error.msg);
+			                    } else if(json.Data.msg!=null) {
+			                        lgksToast(json.Data.msg);
+			                    }
+			                } catch(e) {
+			                    console.error(e);
+			                }
+			            });
+			        }
+			    });
+			}
+		});
+	} else {
+		lgksConfirm("This will save the current dashboard into : "+ dashcode, "Save Dashboard !",function(ans) {
+	        if(ans) {
+	            q=[];
+	            $(".dashboardContainer>.dashletContainer").each(function() {q.push($(this).data('dashkey'));});
+	            lx=_service("dashboard","saveDashletFile","json","&dboard="+$(".dashboardContainer").data("dashboard"));
+	            processAJAXPostQuery(lx,"neworder="+q.join(",")+"&dashcode="+dashcode,function(txt) {
+	                try {
+	                    json=$.parseJSON(txt);
+	                    if(json.error!=null) {
+	                        lgksToast(json.error.msg);
+	                    } else if(json.Data.msg!=null) {
+	                        lgksToast(json.Data.msg);
+	                    }
+	                } catch(e) {
+	                    console.error(e);
+	                }
+	            });
+	        }
+	    });
+	}
 }
 
 function save_as_dashboard() {
@@ -260,6 +299,13 @@ function resetdashboard() {
 // 		window.location.reload();
 		$(".dashletContainer").detach();
 	});
+}
+
+function editdashboard() {
+	dboard = $(".dashboardContainer").data("dashboard");
+	if(dboard!=null && dboard.length>0) {
+		openLinkFrame("DashEditor : "+dboard,_link("modules/dashboard/dashedit/"+dboard));
+	}
 }
 
 function createNewdashboard() {

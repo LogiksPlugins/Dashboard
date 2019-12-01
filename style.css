@@ -225,7 +225,7 @@
 .dashboardSettingsIcon {
 	right: 10px;
 }
-.dashboardSaveAsIcon {
+.dashboardSaveAsIcon,.dashboardEditIcon {
 	right: 45px;
 }
 .dashboardSaveIcon {
