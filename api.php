@@ -5,24 +5,23 @@ if(!function_exists("getDefaultDashletConfig")) {
 
 	function findDashboardFile($dashkey) {
 		$dashFile = false;
-		if($dashkey) {
-			$dashkey = str_replace(".","/",$dashkey);
-			$dashFile = false;
-			
-			if(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json")) {
-				$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json";
-			} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json")) {
-				$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json";
-			} elseif(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json")) {
-				$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json";
-			} else {
-				// echo "<h1 align=center>"._ling("Sorry, Dashboard not configured yet")."</h1>";
-				return false;
-			}
-		} elseif(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}.json")) {
+		if(!$dashkey) {
+			$dashkey = "default";
+		}
+		$dashkey = str_replace(".","/",$dashkey);
+		$dashFile = false;
+		
+		if(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json")) {
+			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json";
+		} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json")) {
+			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json";
+		} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}.json")) {
 			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}.json";
-		} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/default.json")) {
-			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/default.json";
+		} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json")) {
+			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$dashkey}.json";
+		} else {
+			// echo "<h1 align=center>"._ling("Sorry, Dashboard not configured yet")."</h1>";
+			return false;
 		}
 
 		if($dashFile && is_file($dashFile)) {
