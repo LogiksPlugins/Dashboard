@@ -45,7 +45,11 @@ switch($slugs["a"]) {
 $dashboardConfig = [];
 switch($mode) {
 	case "viewer":
-		$dashboardConfig=getUserConfig("dashboard-".SITENAME."-".$dboard);
+		if(!isset($_GET['reset']) || $_GET['reset']!="true") {
+			$dashboardConfig = getUserConfig("dashboard-".SITENAME."-".$dboard);
+		} else {
+			$dashboardConfig = [];
+		}
 
 		if(!isset($dashboardConfig['dashlets']) || count($dashboardConfig['dashlets'])<=0) {
 			$dashFile = findDashboardFile($dboard);
