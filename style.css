@@ -237,7 +237,9 @@
 .dashboardResetIcon {
 	right: 135px;
 }
-
+.dashboardReloadIcon {
+	right: 75px;
+}
 
 /*Dashboard Settings Window*/
 #dashboardSettingsModal {

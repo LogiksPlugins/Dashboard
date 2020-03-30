@@ -108,6 +108,7 @@ echo _js($dashboardConfig['preload']['js']);
 			printDashlet($dashkey, $dashboardConfig['dashlets'][$dashkey],$dashboardConfig);
 		}
 		if($mode=="viewer") {
+			echo "<i class='fa fa-refresh dashboardSetupIcon dashboardReloadIcon' title='Refresh Dashboard'></i>";
 			if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
 				$dashboardConfig['params']['allow_controller']=1;
 				echo "<i class='fa fa-pencil dashboardSetupIcon dashboardEditIcon development' title='Edit this Dashboard'></i>";

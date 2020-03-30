@@ -49,6 +49,12 @@ $(function() {
 		editdashboard();
 	});
 
+	$(".dashboardContainer").delegate(".dashboardReloadIcon","click",function(e) {
+		e.preventDefault();
+
+		reloaddashboard();
+	});
+
 	$("#dashboardContainer").delegate(".dashletPanel .dashletOption.dashletHandle","click",function(e) {
 		e.preventDefault();
 
@@ -291,6 +297,10 @@ function save_as_dashboard() {
             });
 		}
 	});
+}
+
+function reloaddashboard() {
+	window.location = window.location.href.replace("&reset=true","")+"&reset=true";
 }
 
 function resetdashboard() {
