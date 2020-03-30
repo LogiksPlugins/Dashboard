@@ -304,7 +304,13 @@ function resetdashboard() {
 function editdashboard() {
 	dboard = $(".dashboardContainer").data("dashboard");
 	if(dboard!=null && dboard.length>0) {
-		openLinkFrame("DashEditor : "+dboard,_link("modules/dashboard/dashedit/"+dboard));
+		if(typeof openLinkFrame == "function") {
+			openLinkFrame("DashEditor : "+dboard,_link("modules/dashboard/dashedit/"+dboard));
+		} else if(typeof top['openLinkFrame'] == "function") {
+			top.openLinkFrame("DashEditor : "+dboard,_link("modules/dashboard/dashedit/"+dboard));
+		} else {
+			window.open(_link("modules/dashboard/dashedit/"+dboard));
+		}
 	}
 }
 
