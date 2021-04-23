@@ -62,7 +62,9 @@ switch($mode) {
 				}
 			}
 
-			setUserConfig("dashboard-".SITENAME."-".$dboard,$dashboardConfig);
+			if(!isset($_GET['nocache']) || $_GET['nocache']!="false") {
+				setUserConfig("dashboard-".SITENAME."-".$dboard,$dashboardConfig);
+			}
 		}
 		break;
 	case "editor":
@@ -94,9 +96,20 @@ if(!isset($dashboardConfig['access']) || $dashboardConfig['access']!="public") {
 	}
 }
 
-foreach ($dashboardConfig['preload']['module'] as $module) {
-	loadModule($module);
+if(isset($dashboardConfig['preload'])) {
+	if(isset($dashboardConfig['preload']['module'])) {
+		foreach ($dashboardConfig['preload']['module'] as $module) {
+			loadModule($module);
+		}
+	}
+	if(isset($dashboardConfig['preload']['vendor'])) {
+		foreach ($dashboardConfig['preload']['vendor'] as $vendor) {
+			loadVendor($vendor);
+		}
+	}
 }
+
+//printArray($dashboardConfig);
 
 echo _css($dashboardConfig['preload']['css']);
 echo _js($dashboardConfig['preload']['js']);
@@ -108,9 +121,14 @@ echo _js($dashboardConfig['preload']['js']);
 			printDashlet($dashkey, $dashboardConfig['dashlets'][$dashkey],$dashboardConfig);
 		}
 		if($mode=="viewer") {
-			echo "<i class='fa fa-refresh dashboardSetupIcon dashboardReloadIcon' title='Refresh Dashboard'></i>";
-			if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
-				$dashboardConfig['params']['allow_controller']=1;
+			if($dashboardConfig['params']['allow_reset']) {
+				echo "<i class='fa fa-refresh dashboardSetupIcon dashboardReloadIcon' title='Refresh Dashboard'></i>";
+			}
+			// if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {
+			// 	$dashboardConfig['params']['allow_controller']=1;
+			// 	echo "<i class='fa fa-pencil dashboardSetupIcon dashboardEditIcon development' title='Edit this Dashboard'></i>";
+			// }
+			if($dashboardConfig['params']['allow_edit']) {
 				echo "<i class='fa fa-pencil dashboardSetupIcon dashboardEditIcon development' title='Edit this Dashboard'></i>";
 			}
 			if($dashboardConfig['params']['allow_controller']) {

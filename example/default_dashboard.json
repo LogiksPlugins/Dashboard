@@ -1,12 +1,19 @@
 {
 	"params": {
 		"background": "",
-		"force_span": "",
-		"force_style": "",
-		"force_open": "",
-		"allow_server_messages": true,
-		"allow_closing": false,
-		"allow_controller": true
+        "force_span": "",
+        "force_style": "",
+        "force_open": "",
+        "allow_dnd": false,
+        "allow_server_messages": true,
+        "allow_controller": false,
+        "allow_reset": false,
+        "allow_edit": false,
+        "dashlet_allow_minimize": true,
+        "dashlet_allow_focus": true,
+        "dashlet_allow_closing": true,
+        "dashlet_allow_configure": true,
+        "dashlet_header": true
 	},
 	"order": [],
 	"dashlets": {

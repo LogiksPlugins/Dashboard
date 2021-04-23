@@ -56,7 +56,7 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 									  		if(is_bool($value) || (is_integer($value) && $value===1) || (is_integer($value) && $value===0)) {
 									  			$checked1 = $value?"checked=checked":"";
 									  			$checked2 = $value?"":"checked=checked";
-									  			echo "<div class='form-group'>
+									  			echo "<div class='form-group col-md-4'>
 												    <label class='control-label col-sm-4'>{$title}:</label>
 												    <div class='col-sm-8'>
 												      <label>
@@ -70,7 +70,7 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 												    </div>
 												  </div>";
 									  		} else {
-									  			echo "<div class='form-group'>
+									  			echo "<div class='form-group col-md-6'>
 												    <label class='control-label col-sm-4' for='{$key}'>{$title}:</label>
 												    <div class='col-sm-8'>
 												      <input type='text' class='form-control' id='{$key}' name='{$key}' placeholder='Enter {$title}' value='{$value}'>

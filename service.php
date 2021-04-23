@@ -233,11 +233,15 @@ switch($_REQUEST["action"]) {
 					$dashkey=md5(basename($src).time());
 
 					$json['dashid']=$d;
+					$json['dashkey']=$dashkey;
 
 					$dashboardConfig['order'][]=$dashkey;
 					$dashboardConfig['dashlets'][$dashkey]=$json;
 				}
 			}
+
+			$dashboardConfig['order'] = array_unique($dashboardConfig['order']);
+
 			setUserConfig("dashboard-".SITENAME."-".$_GET['dboard'],$dashboardConfig);
 			
 			if(strtolower(getConfig("APPS_STATUS"))!="production" && strtolower(getConfig("APPS_STATUS"))!="prod") {

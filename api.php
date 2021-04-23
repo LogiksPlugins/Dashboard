@@ -11,6 +11,10 @@ if(!function_exists("getDefaultDashletConfig")) {
 		$dashkey = str_replace(".","/",$dashkey);
 		$dashFile = false;
 		
+		if(is_file($dashkey.".json") && file_exists($dashkey.".json")) {
+			return $dashkey.".json";
+		}
+
 		if(isset($_SESSION['SESS_PRIVILEGE_NAME']) && file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json")) {
 			$dashFile = APPROOT.APPS_MISC_FOLDER."dashboards/{$_SESSION['SESS_PRIVILEGE_NAME']}/{$dashkey}.json";
 		} elseif(file_exists(APPROOT.APPS_MISC_FOLDER."dashboards/commons/{$dashkey}.json")) {
@@ -62,6 +66,8 @@ if(!function_exists("getDefaultDashletConfig")) {
 				"allow_closing"=> false,
 				"allow_dnd"=>true,
 				"allow_controller"=> true,
+				"allow_reset"=> true,
+				"allow_edit"=> true,
 				"dashlet_allow_minimize"=>true,
 				"dashlet_allow_focus"=>true,
 				"dashlet_allow_closing"=> true,
@@ -188,6 +194,18 @@ if(!function_exists("getDefaultDashletConfig")) {
 				$html.=createDataSelector($config['options']);
 				$html.="</select>";
 				break;
+			case 'dataSelectorFromTable':
+				$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
+				$html.=generateSelectOptions($config, $key, "app");
+				$html.="</select>";
+				break;
+			case 'dataSelectorMethod':
+				$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
+				if(isset($config['method'])) {
+					$html.=call_user_func($config['method'], $config);
+				}
+				$html.="</select>";
+				break;
 			default:
 				$html.="<input name='$key' type='text' class='form-control' data-value='{$config['value']}' value='{$config['value']}' />";
 				break;
@@ -208,6 +226,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 		if(isset($dashboardConfig['params']['force_span']) && strlen($dashboardConfig['params']['force_span'])>0) {
 			$spanClass = $dashboardConfig['params']['force_span'];
 		}
+		$dashletConfig['dashletid'] = $dashkey;
 		?>
 			<div data-dashkey='<?=$dashkey?>' class='dashletContainer <?=$spanClass?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>'>
 				<div class="dashletPanel <?=$dashlet['active']?"active":''?> panel panel-default ajaxloading ajaxloading8">
@@ -273,6 +292,14 @@ if(!function_exists("getDefaultDashletConfig")) {
 								}
 							?>
 						</select></td> </tr>
+						<tr> <th>
+							Dashlet Title
+						</th><td>
+							<?=getDashConfigEditor("title",[
+								"title"=>"Dashlet Title",
+								"value"=>$dashlet['title']
+							]);?>
+						</td> </tr>
 						<?php
 							if(!isset($dashlet['schema'])) $dashlet['schema']=[];
 							foreach ($dashlet['config'] as $key => $value) {
