@@ -3,6 +3,10 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 
 if(!function_exists("getDefaultDashletConfig")) {
 
+	function generateDashletID($dashkey, $dboard) {
+		return md5(session_id().time().$_SERVER['REMOTE_ADDR'].$dashkey.$dboard);
+	}
+
 	function findDashboardFile($dashkey) {
 		$dashFile = false;
 		if(!$dashkey) {
@@ -165,53 +169,61 @@ if(!function_exists("getDefaultDashletConfig")) {
 		if(!isset($config['value'])) $config['value']="";
 
 		$html="";
+		
+		loadModuleLib("forms", "api");
 
-		switch ($config['type']) {
-			case 'select':
-				$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
-				if(isset($config['options'])) {
-					if(!is_array($config['options'])) {
-						$config['options']=explode(",", $config['options']);
-						foreach ($config['options'] as $key => $value) {
-							if($value==$config['value'])
-								$html.="<option value='$value' selected>"._ling($value)."</option>";
-							else
-								$html.="<option value='$value'>"._ling($value)."</option>";
-						}
-					} else {
-						foreach ($config['options'] as $key => $value) {
-							if($key==$config['value'])
-								$html.="<option value='$key' selected>"._ling($value)."</option>";
-							else
-								$html.="<option value='$key'>"._ling($value)."</option>";
-						}
-					}
-				}
-				$html.="</select>";
-				break;
-			case 'dataSelector':
-				$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
-				$html.=createDataSelector($config['options']);
-				$html.="</select>";
-				break;
-			case 'dataSelectorFromTable':
-				$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
-				$html.=generateSelectOptions($config, $key, "app");
-				$html.="</select>";
-				break;
-			case 'dataSelectorMethod':
-				$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
-				if(isset($config['method'])) {
-					$html.=call_user_func($config['method'], $config);
-				}
-				$html.="</select>";
-				break;
-			default:
-				$html.="<input name='$key' type='text' class='form-control' data-value='{$config['value']}' value='{$config['value']}' />";
-				break;
-		}
-
+		$config['fieldkey'] = $key;
+		$data = [];
+		$data[$key] = $config['value'];
+		$html.=getFormField($config, $data, "app");
 		return $html;
+
+		// switch ($config['type']) {
+		// 	case 'select':
+		// 		$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
+		// 		if(isset($config['options'])) {
+		// 			if(!is_array($config['options'])) {
+		// 				$config['options']=explode(",", $config['options']);
+		// 				foreach ($config['options'] as $key => $value) {
+		// 					if($value==$config['value'])
+		// 						$html.="<option value='$value' selected>"._ling($value)."</option>";
+		// 					else
+		// 						$html.="<option value='$value'>"._ling($value)."</option>";
+		// 				}
+		// 			} else {
+		// 				foreach ($config['options'] as $key => $value) {
+		// 					if($key==$config['value'])
+		// 						$html.="<option value='$key' selected>"._ling($value)."</option>";
+		// 					else
+		// 						$html.="<option value='$key'>"._ling($value)."</option>";
+		// 				}
+		// 			}
+		// 		}
+		// 		$html.="</select>";
+		// 		break;
+		// 	case 'dataSelector':
+		// 		$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
+		// 		$html.=createDataSelector($config['options']);
+		// 		$html.="</select>";
+		// 		break;
+		// 	case 'dataSelectorFromTable':
+		// 		$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
+		// 		$html.=generateSelectOptions($config, $key, "app");
+		// 		$html.="</select>";
+		// 		break;
+		// 	case 'dataSelectorMethod':
+		// 		$html.="<select name='$key' data-value='{$config['value']}' class='form-control'>";
+		// 		if(isset($config['method'])) {
+		// 			$html.=call_user_func($config['method'], $config);
+		// 		}
+		// 		$html.="</select>";
+		// 		break;
+		// 	default:
+		// 		$html.="<input name='$key' type='text' class='form-control' data-value='{$config['value']}' value='{$config['value']}' />";
+		// 		break;
+		// }
+
+		// return $html;
 	}
 
 	function printDashlet($dashkey, $dashletConfig, $dashboardConfig) {
@@ -228,7 +240,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 		}
 		$dashletConfig['dashletid'] = $dashkey;
 		?>
-			<div data-dashkey='<?=$dashkey?>' class='dashletContainer <?=$spanClass?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>'>
+			<div data-dashkey='<?=$dashkey?>' class='dashletContainer <?=$spanClass?> <?=$dashlet['forcenewrow']?"clear-left":''?> <?=$dashlet['containerClass']?>' data-dashid='<?=$dashlet['dashid']?>'>
 				<div class="dashletPanel <?=$dashlet['active']?"active":''?> panel panel-default ajaxloading ajaxloading8">
 					<?php if($dashboardConfig['params']['dashlet_header'] && $dashlet['header']) { ?>
 					<?php if($dashlet['header']===true) { ?>
@@ -242,7 +254,7 @@ if(!function_exists("getDefaultDashletConfig")) {
 						<?php if($dashboardConfig['params']['dashlet_allow_focus']) { ?>
 						<div class="dashletOption dashletFocus glyphicon glyphicon-eye-open pull-right" cmd='focus'></div>
 						<?php } ?>
-
+						<div class="dashletOption dashletRefresh glyphicon glyphicon-refresh pull-right" cmd='refresh'></div>
 						<?php if($dashboardConfig['params']['dashlet_allow_minimize']) { ?>
 						<div class="dashletOption dashletHandle glyphicon <?=$dashlet['active']?"glyphicon-triangle-top":'glyphicon-triangle-bottom'?> pull-left"></div>
 						<h3 class="panel-title"><?=_ling($dashlet['title'])?></h3>

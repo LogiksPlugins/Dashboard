@@ -3,6 +3,10 @@ var currentDashboardSavekey = null;
 $(function() {
 	$("#dashboardContainer .dashletPanel.ajaxloading").removeClass("ajaxloading8").removeClass("ajaxloading");
 
+	$(".modal select[data-selected]").each(function() {
+        $(this).val(""+$(this).data("selected"));
+    });
+
 	$(".dashboardContainer").delegate(".dashboardSettingsIcon","click",function(e) {
 		e.preventDefault();
 
@@ -139,6 +143,17 @@ function dashboardAction(cmd, dashlet) {
 		break;
 		case "settings":
 			dContainer.find(".panel-options").toggle();
+			// htmlOptions = "<table class='table table-striped dashlet-options' data-dashkey='"+dContainer.data("dashkey")+"'>"+dContainer.find(".panel-options").html()+"</table>";
+   //          lgksAlert(htmlOptions, "Dashlet Configurator");
+   //          setTimeout(function() {
+   //              $(".modal select[data-selected]").each(function() {
+   //                  $(this).val(""+$(this).data("selected"));
+   //              });
+   //          }, 1000);
+		break;
+		case "refresh":
+		    var funcName = "refresh_"+dContainer.data("dashid");
+		    if(typeof window[funcName]=="function") window[funcName](dContainer);
 		break;
 		case "focus":
 			if($("body").find("#focus-overlay").length<=0) {

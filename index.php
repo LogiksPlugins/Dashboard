@@ -109,7 +109,7 @@ if(isset($dashboardConfig['preload'])) {
 	}
 }
 
-//printArray($dashboardConfig);
+// printArray($dashboardConfig);
 
 echo _css($dashboardConfig['preload']['css']);
 echo _js($dashboardConfig['preload']['js']);
